@@ -1,0 +1,78 @@
+version: "1"
+services:
+  # Backend Node.js Service
+  - type: web
+    name: mvp-idiomas-server
+    env: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+
+  # Frontend Static Site (Defined as Web Service with static env)
+  - type: web
+    name: mvp-idiomas-client
+    env: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: mvp-idiomas-server
+          property: host
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  # TalkMe (Lenguini-Gemini) Static Site
+  - type: web
+    name: talkme-vision
+    env: static
+    rootDir: talkme
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_GEMINI_API_KEY
+        sync: false
+
+  # TalkMe v2 (Simplified Version) Static Site
+  - type: web
+    name: talkme2-vision
+    env: static
+    rootDir: talkme2
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_KEY
+        sync: false
+

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS WhatsApp - Test de Conexión</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #075e54;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 70%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #128c7e;
+        }
+
+        #qr-container {
+            margin-top: 30px;
+            min-height: 264px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .loading {
+            color: #888;
+            font-style: italic;
+        }
+
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h1>🔗 Conectar Nuevo Cliente</h1>
+        <p>Introduce el nombre del negocio para generar su instancia y QR.</p>
+
+        <input type="text" id="companyName" placeholder="Ej. Pizzería Don Pepe" />
+
+        <label for="businessType"
+            style="display:block; text-align:left; margin: 10px auto; width: 70%; font-weight:bold; color:#444;">Tipo de
+            Negocio:</label>
+        <select id="businessType"
+            style="width: 75%; padding: 12px; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px;">
+            <option value="generic">🏢 Genérico (Soporte)</option>
+            <option value="pizzeria">🍕 Pizzería (Pedidos)</option>
+            <option value="dentista">🦷 Dentista (Citas)</option>
+        </select>
+        <br>
+        <button onclick="generateQR()">Generar Código QR</button>
+
+        <div id="error-msg" class="error"></div>
+
+        <div id="qr-container">
+            <span style="color: #ccc;">El código QR aparecerá aquí</span>
+        </div>
+
+        <div id="status-text" class="status"></div>
+    </div>
+
+    <script>
+        async function generateQR() {
+            const company = document.getElementById('companyName').value;
+            const businessType = document.getElementById('businessType').value;
+
+            const btn = document.querySelector('button');
+            const qrContainer = document.getElementById('qr-container');
+            const statusText = document.getElementById('status-text');
+            const errorDiv = document.getElementById('error-msg');
+
+            if (!company) {
+                alert('Por favor escribe un nombre para la empresa.');
+                return;
+            }
+
+            // UI Loading State
+            btn.disabled = true;
+            btn.innerText = 'Creando Instancia...';
+            qrContainer.innerHTML = '<span class="loading">Iniciando bot ' + businessType + '...</span>';
+            errorDiv.style.display = 'none';
+            statusText.innerHTML = '';
+
+            try {
+                // 1. Call your Node.js Backend
+                console.log('Fetching from: http://localhost:3000/webhook/whatsapp/connect');
+                const response = await fetch('http://localhost:3000/webhook/whatsapp/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ companyName: company, businessType: businessType })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server Error (${response.status}): ${errorText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.qr_code) {
+                    // 2. Display QR
+                    qrContainer.innerHTML = `<img src="${data.qr_code}" alt="Escanea este QR" />`;
+                    statusText.innerHTML = `✅ <strong>Instancia Creada:</strong> ${data.instance_id}<br>Escanea ahora con WhatsApp.`;
+                } else {
+                    qrContainer.innerHTML = '⚠️ Instancia creada, pero no llegó el QR. Revisa los logs del servidor.';
+                }
+
+            } catch (err) {
+                console.error(err);
+                qrContainer.innerHTML = '<span style="color:red">❌ Error</span>';
+                errorDiv.innerText = `Fallo: ${err.message}`;
+                errorDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Generar Código QR';
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+
+{
+  "name": "TalkMe AI - MVP Idiomas",
+  "description": "An AI-powered language learning platform featuring interactive chats, grammar corrections, and voice feedback using Gemini 3.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+    "es": {
+        "hola": {
+            "en": "Hello",
+            "de": "Hallo"
+        },
+        "gracias": {
+            "en": "Thank you",
+            "de": "Danke"
+        },
+        "por favor": {
+            "en": "Please",
+            "de": "Bitte"
+        },
+        "dónde está el baño?": {
+            "en": "Where is the bathroom?",
+            "de": "Wo ist die Toilette?"
+        },
+        "cuánto cuesta?": {
+            "en": "How much does it cost?",
+            "de": "Wie viel kostet das?"
+        },
+        "ayuda": {
+            "en": "Help",
+            "de": "Hilfe"
+        },
+        "si": {
+            "en": "Yes",
+            "de": "Ja"
+        },
+        "no": {
+            "en": "No",
+            "de": "Nein"
+        },
+        "no entiendo": {
+            "en": "I don't understand",
+            "de": "Ich verstehe nicht"
+        }
+    },
+    "en": {
+        "hello": {
+            "es": "Hola"
+        },
+        "thank you": {
+            "es": "Gracias"
+        },
+        "please": {
+            "es": "Por favor"
+        },
+        "where is the bathroom?": {
+            "es": "¿Dónde está el baño?"
+        }
+    }
+}

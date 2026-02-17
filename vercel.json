@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "talkme2/package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "server/index.js"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/talkme2/dist/$1"
+        }
+    ],
+    "env": {
+        "NODE_ENV": "production"
+    },
+    "buildCommand": "cd talkme2 && npm install && npm run build",
+    "outputDirectory": "talkme2/dist",
+    "framework": "vite"
+}
